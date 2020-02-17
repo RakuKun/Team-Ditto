@@ -1,0 +1,7 @@
+Ditto_0210/.vscode
+Ditto_0210/Library
+Ditto_0210/Logs
+Ditto_0210/Temp
+*.csproj
+*.sln
+Ditto_0210/obj
