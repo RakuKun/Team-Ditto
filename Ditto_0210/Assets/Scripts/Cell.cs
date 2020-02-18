@@ -122,10 +122,10 @@ public class Cell : MonoBehaviour
     public IEnumerator Jump(Vector3 direction)
     {
         
-        if (Input.GetAxisRaw(joystick) > 0)
+        if (Input.GetAxisRaw(joystick) > 0 || Input.GetKey("d"))
             direction = new Vector3(JumpDistance,JumpHeight,0);
-        else if (Input.GetAxisRaw(joystick) < 0)
-            direction = new Vector3(-JumpDistance,JumpHeight,0);
+        else if (Input.GetAxisRaw(joystick) < 0 || Input.GetKey("a"))
+            direction = new Vector3(-JumpDistance,JumpHeight,0 );
         else 
             direction = new Vector3(0,JumpHeight,0);
         Debug.Log("Jump");
