@@ -13,15 +13,13 @@ public class Cell : MonoBehaviour
     public Rigidbody rb;
     float JoyStickA;
     public string joystick;
+    public float MaxSpeed = 8;
   
     public bool isGrounded = true;
-    public bool FinishJump = true;
-    protected int NumOfPlayer = 1;
     public int JumpPower = 3500;
     public float JumpHeight = 1.5f;
     public float JumpDistance = 1;
     public float MoveSpeed = 5;
-    public int CellLevel = 1;
     
     
     
@@ -80,6 +78,15 @@ public class Cell : MonoBehaviour
         }
         
         
+    }
+
+    private void FixedUpdate() 
+    {
+        if(rb.velocity.magnitude > MaxSpeed)
+        {
+            rb.velocity = rb.velocity.normalized * MaxSpeed;
+        } 
+        Debug.Log(rb.velocity);
     }
     void IsGrounded()
     {
