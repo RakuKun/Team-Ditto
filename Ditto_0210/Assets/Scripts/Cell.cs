@@ -86,14 +86,12 @@ public class Cell : MonoBehaviour
         {
             rb.velocity = rb.velocity.normalized * MaxSpeed;
         } 
-        Debug.Log(rb.velocity);
     }
     void IsGrounded()
     {
         if (Physics.Raycast(transform.position, -Vector3.up, this.transform.localScale.y/2 + 0.05f))
         {
             isGrounded = true;
-            Debug.Log("Ground");
         }
     
     }
@@ -117,13 +115,7 @@ public class Cell : MonoBehaviour
 
     public void LazyFollow(Vector3 Destination)
     {
-        //this.transform.DOMoveX(Destination.x,1f);
-        // Vector3 Direction = (Destination - this.transform.position).normalized;
-        // Direction.z =0;
-        // Quaternion XLookRotation = Quaternion.LookRotation(Destination, transform.up) * Quaternion.Euler(new Vector3(0, 90, 0));
-        //rb.AddForce(Vector3.right *JoyStickA*150);
-        transform.Translate(Vector3.right*Time.deltaTime*JoyStickA*MoveSpeed,Space.World);
-            
+        transform.Translate(Vector3.right*Time.deltaTime*JoyStickA*MoveSpeed,Space.World);     
     }
 
     public IEnumerator Jump(Vector3 direction)
@@ -138,7 +130,6 @@ public class Cell : MonoBehaviour
         Debug.Log("Jump");
         rb.AddForce(direction *JumpPower);
         yield return new WaitForSeconds(0.1f);
-        //FinishJump = true;
     }
 
     protected void Split()
@@ -153,8 +144,6 @@ public class Cell : MonoBehaviour
             newCell.transform.localScale = OriginalScale;
             newCell.GetComponent<Cell>().OriginalScale = this.transform.localScale;
             newCell.GetComponent<Rigidbody>().useGravity = true;
-            //this.GetComponent<Rigidbody>().mass = OriginalScale.z * CellManager.instance.DefaultMass;
-            //newCell.GetComponent<Rigidbody>().mass = newCell.transform.localScale.z * CellManager.instance.DefaultMass;
             MoveSpeed = CellManager.instance.DefaultSpeed/(OriginalScale.z+CellManager.instance.SpeedDamp);
             newCell.GetComponent<Cell>().MoveSpeed = CellManager.instance.DefaultSpeed/(newCell.transform.localScale.z+CellManager.instance.SpeedDamp);
         }
@@ -183,7 +172,6 @@ public class Cell : MonoBehaviour
             float AddedSize = OriginalScale.z/1.6f + EatenCell.transform.localScale.z/1.6f;
             this.transform.localScale = new Vector3(AddedSize,AddedSize,AddedSize);
             OriginalScale = this.transform.localScale;
-            //this.GetComponent<Rigidbody>().mass = OriginalScale.z * CellManager.instance.DefaultMass;
             MoveSpeed = CellManager.instance.DefaultSpeed/(OriginalScale.z+CellManager.instance.SpeedDamp);
             Destroy(EatenCell);
             this.transform.DOPunchScale(this.transform.localScale*0.3f,0.4f,10,0.5f);
@@ -194,7 +182,6 @@ public class Cell : MonoBehaviour
             float AddedSize = OriginalScale.z/1.6f + EatenCell.transform.localScale.z/1.6f;
             this.transform.localScale = new Vector3(AddedSize,AddedSize,AddedSize);
             OriginalScale = this.transform.localScale;
-            //this.GetComponent<Rigidbody>().mass = OriginalScale.z * CellManager.instance.DefaultMass;
             MoveSpeed = CellManager.instance.DefaultSpeed/(OriginalScale.z+CellManager.instance.SpeedDamp);
             Destroy(EatenCell);
             this.transform.DOPunchScale(this.transform.localScale*0.3f,0.4f,10,0.5f);
