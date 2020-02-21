@@ -37,6 +37,7 @@ public class Cell : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Debug.Log(Input.GetJoystickNames()[0] +Input.GetJoystickNames()[1]);
         JoyStickA = Input.GetAxisRaw(joystick);
         
         if (Input.GetAxisRaw(joystick)!= 0 && isGrounded)

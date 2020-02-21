@@ -58,7 +58,7 @@ public class Cell_obi : MonoBehaviour
     void Update()
     {
         JoyStickA = Input.GetAxisRaw(joystick);
-        
+        Debug.Log(Input.GetJoystickNames()[0] +" 2:"+Input.GetJoystickNames()[1]);
         // if (Input.GetAxisRaw(joystick)!= 0 && isGrounded)
         // {
         //     LazyFollow(this.transform.position + Vector3.right * Time.deltaTime*JoyStickA*40);
