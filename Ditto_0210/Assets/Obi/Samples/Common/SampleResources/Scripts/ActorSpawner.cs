@@ -19,10 +19,11 @@ public class ActorSpawner : MonoBehaviour {
 	void Update () {
 
 		timeFromLastSpawn += Time.deltaTime;
+		Vector3 offset = new Vector3(0.1f,0.1f,0.1f);
 
 		if (Input.GetMouseButtonDown(0) && instances < maxInstances && timeFromLastSpawn > spawnDelay)
 		{
-			GameObject go = Instantiate(template.gameObject,transform.position,Quaternion.identity);
+			GameObject go = Instantiate(template.gameObject,transform.parent.GetChild(0).position +offset,Quaternion.identity);
             go.transform.SetParent(transform.parent);
 
             go.GetComponent<ObiActor>().SetPhase(basePhase + phase);

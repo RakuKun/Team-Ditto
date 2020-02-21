@@ -15,7 +15,7 @@ namespace Obi
 
         // shape matching constraints:
         [SerializeField] protected bool _shapeMatchingConstraintsEnabled = true;
-        [SerializeField] [Range(0, 5)] protected float _deformationResistance = 5;
+        [SerializeField] [Range(0, 1)] protected float _deformationResistance = 1;
         [SerializeField] [Range(0, 1)] protected float _maxDeformation = 0;
         [SerializeField] protected float _plasticYield = 0;
         [SerializeField] protected float _plasticCreep = 0;
