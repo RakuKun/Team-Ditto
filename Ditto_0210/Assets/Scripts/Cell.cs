@@ -9,6 +9,7 @@ public class Cell : MonoBehaviour
     
     public GameObject CellObject;
     public Vector3 OriginalScale;
+    public Vector3 currentVel;
     Vector3 previous;
     public Rigidbody rb;
     float JoyStickA;
@@ -21,6 +22,7 @@ public class Cell : MonoBehaviour
     public float JumpHeight = 1.5f;
     public float JumpDistance = 1;
     public float MoveSpeed = 5;
+
     public int CellLevel = 1;
     
     
@@ -37,7 +39,8 @@ public class Cell : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(Input.GetJoystickNames()[0] +Input.GetJoystickNames()[1]);
+        
+        //Debug.Log(rb.velocity);
         JoyStickA = Input.GetAxisRaw(joystick);
         
         if (Input.GetAxisRaw(joystick)!= 0 && isGrounded)
@@ -95,17 +98,26 @@ public class Cell : MonoBehaviour
     public void Stretching()
     {
         var velocity = (this.transform.position - previous) / Time.deltaTime;
+        
         if (velocity.x>10) velocity.x = 10;
         else if (velocity.x<-10) velocity.x = -10;
         if (velocity.y>10) velocity.y = 10;
         else if (velocity.y<-10) velocity.y = -10;
         if (velocity.z>10) velocity.z = 10;
         else if (velocity.z<-10) velocity.z = -10;
-        this.transform.localScale = new Vector3 (Mathf.Abs(velocity.x/30),
+        Vector3 scaler = new Vector3 (Mathf.Abs(velocity.x/30),
                                                  Mathf.Abs(velocity.y/30),
                                                  Mathf.Abs(velocity.z/30)
-                                                ) + OriginalScale;
+                                                );
+        // this.transform.localScale = new Vector3 (Mathf.Abs(velocity.x/30),
+        //                                          Mathf.Abs(velocity.y/30),
+        //                                          Mathf.Abs(velocity.z/30)
+        //                                         ) + OriginalScale;
+        currentVel = scaler;
+        Vector3 newScale = Vector3.Scale(scaler,OriginalScale )+ OriginalScale;
+        //this.transform.localScale = newScale;
         previous = this.transform.position;
+
     }
     
 
@@ -115,8 +127,8 @@ public class Cell : MonoBehaviour
         // Vector3 Direction = (Destination - this.transform.position).normalized;
         // Direction.z =0;
         // Quaternion XLookRotation = Quaternion.LookRotation(Destination, transform.up) * Quaternion.Euler(new Vector3(0, 90, 0));
-        //rb.AddForce(Vector3.right *JoyStickA*150);
-        transform.Translate(Vector3.right*Time.deltaTime*JoyStickA*MoveSpeed,Space.World);
+        rb.AddForce(Vector3.right *JoyStickA*100);
+        //transform.Translate(Vector3.right*Time.deltaTime*JoyStickA*MoveSpeed,Space.World);
             
     }
 
