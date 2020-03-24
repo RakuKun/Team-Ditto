@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.UI;
 
 public class Cell : MonoBehaviour
 {
@@ -16,14 +17,26 @@ public class Cell : MonoBehaviour
     public float MaxSpeed = 8;
   
     public bool isGrounded = true;
-    public int JumpPower = 3500;
+    public float JumpPower = 3500;
     public float JumpHeight = 1.5f;
     public float JumpDistance = 1;
     public float MoveSpeed = 5;
-    
+    public float MoveForce = 80;
+    public GameObject SecondCamera;
+    public int points = 0;
+    public bool isFirstJump = false;
+    public Text Instructiontext;
+    private Collision EatenOne;
+    private bool EatenCollision = false;
+    public Vector3 currentVel;
     
     
     // Start is called before the first frame update
+    private void Awake() {
+        JumpHeight = CellManager.instance.DefaultJumpHeight;
+        JumpPower = CellManager.instance.DefaultJumpPower;
+        MoveForce = CellManager.instance.DefaultMoveForce;
+    }
     void Start()
     {
         OriginalScale = this.transform.localScale;
@@ -37,10 +50,7 @@ public class Cell : MonoBehaviour
     {
         JoyStickA = Input.GetAxisRaw(joystick);
         
-        if (Input.GetAxisRaw(joystick)!= 0 && isGrounded)
-        {
-            LazyFollow(this.transform.position + Vector3.right * Time.deltaTime*JoyStickA*40);
-        }
+        
 
         //Key input for testing
         if (Input.GetKey("a") && isGrounded)
@@ -60,41 +70,66 @@ public class Cell : MonoBehaviour
         }
         
         //change scale
-        Stretching();
         
     
+        
+        
+        Stretching();
+
         if (Input.GetKeyDown(joystick + " button 0")  || Input.GetKeyDown("space"))
         {
-            IsGrounded();
+            //IsGrounded();
             if (isGrounded)
             {
-                isGrounded = false;
+                isFirstJump = true;
+                
+                 
                 //FinishJump = false;
                 //rb.useGravity = false;
-            
+                isGrounded = false;
+                StartCoroutine(Jump(Vector2.one));
+            }
+            else if (isFirstJump)
+            {
+                isFirstJump = false;
                 StartCoroutine(Jump(Vector2.one));
             }
             
         }
+
+        isGrounded = IsGround();
         
-        
+    }
+
+    private bool IsGround()
+    {
+        if (this.transform.GetChild(0).GetComponent<DetectGround>().isGrounded == false
+            && this.transform.GetChild(1).GetComponent<DetectGround>().isGrounded == false)
+            return false;
+        else 
+            return true;
     }
 
     private void FixedUpdate() 
     {
+        if (Input.GetAxisRaw(joystick)!= 0 && (isGrounded||isFirstJump))
+        {
+            if (isGrounded)
+                LazyFollow(MoveForce);
+            else
+                LazyFollow(MoveForce*1f);
+        }
+        //Stretching();
         if(rb.velocity.magnitude > MaxSpeed)
         {
             rb.velocity = rb.velocity.normalized * MaxSpeed;
         } 
+        //IsGrounded();
+        
     }
-    void IsGrounded()
-    {
-        if (Physics.Raycast(transform.position, -Vector3.up, this.transform.localScale.y/2 + 0.05f))
-        {
-            isGrounded = true;
-        }
     
-    }
+
+    
 
     public void Stretching()
     {
@@ -109,13 +144,15 @@ public class Cell : MonoBehaviour
                                                  Mathf.Abs(velocity.y/30),
                                                  Mathf.Abs(velocity.z/30)
                                                 ) + OriginalScale;
+        currentVel =  new Vector3(this.transform.localScale.x, this.transform.localScale.y,this.transform.localScale.z);                                      
         previous = this.transform.position;
     }
     
 
-    public void LazyFollow(Vector3 Destination)
+    public void LazyFollow(float MoveForce)
     {
-        transform.Translate(Vector3.right*Time.deltaTime*JoyStickA*MoveSpeed,Space.World);     
+        rb.AddForce(Vector3.right*JoyStickA*MoveForce);
+        //transform.Translate(Vector3.right*Time.deltaTime*JoyStickA*MoveSpeed,Space.World);     
     }
 
     public IEnumerator Jump(Vector3 direction)
@@ -127,54 +164,120 @@ public class Cell : MonoBehaviour
             direction = new Vector3(-JumpDistance,JumpHeight,0);
         else 
             direction = new Vector3(0,JumpHeight,0);
-        Debug.Log("Jump");
         rb.AddForce(direction *JumpPower);
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.3f);
+
     }
 
     protected void Split()
     {
-        if (this.transform.localScale.x>0.4f && this.transform.localScale.y>0.4f &&this.transform.localScale.z>0.4f)
+        if (this.transform.localScale.x > CellManager.instance.SmallestCellSize 
+            && this.transform.localScale.y > CellManager.instance.SmallestCellSize 
+            && this.transform.localScale.z > CellManager.instance.SmallestCellSize)
         {
             CellManager.instance.PlayerNumber ++;
             GameObject newCell = Instantiate(CellObject, this.transform.position,this.transform.rotation);
             newCell.GetComponent<Cell>().joystick = "joystick " + CellManager.instance.PlayerNumber.ToString();
+            newCell.GetComponent<Cell>().points = 0;
             this.transform.localScale = OriginalScale*0.8f;
             OriginalScale = this.transform.localScale;
             newCell.transform.localScale = OriginalScale;
             newCell.GetComponent<Cell>().OriginalScale = this.transform.localScale;
             newCell.GetComponent<Rigidbody>().useGravity = true;
             MoveSpeed = CellManager.instance.DefaultSpeed/(OriginalScale.z+CellManager.instance.SpeedDamp);
+            JumpHeight = CellManager.instance.DefaultJumpHeight * this.transform.localScale.z;
+            JumpPower = CellManager.instance.DefaultJumpPower * this.transform.localScale.z;
+            rb.mass = CellManager.instance.DefaultMass * this.transform.localScale.z;
+            newCell.GetComponent<Rigidbody>().mass = CellManager.instance.DefaultMass * this.transform.localScale.z;
+            newCell.GetComponent<Cell>().JumpPower = CellManager.instance.DefaultJumpPower * this.transform.localScale.z;
+            newCell.GetComponent<Cell>().JumpHeight = CellManager.instance.DefaultJumpHeight * this.transform.localScale.z;
             newCell.GetComponent<Cell>().MoveSpeed = CellManager.instance.DefaultSpeed/(newCell.transform.localScale.z+CellManager.instance.SpeedDamp);
+            this.transform.DOPunchScale(this.transform.localScale*-0.3f,0.4f,10,0.5f);
+            if (SecondCamera!=null && SecondCamera.GetComponent<FollowPlayer>().Player == null)
+            {
+                SecondCamera.GetComponent<FollowPlayer>().Player = newCell;
+                Instructiontext.text = "Welcome!";
+                StartCoroutine(SetupWelcome());
+            }
         }
     }
 
-    private void OnCollisionEnter(Collision other) 
+    IEnumerator SetupWelcome()
+    {
+        yield return new WaitForSeconds(1.5f);
+        Instructiontext.text = "";
+    }
+
+    private void OnCollisionStay(Collision other) 
     {
         if (other.gameObject.tag == "Cell")
         {
+            //EatenOne = other;
+            //EatenCollision = true;
             if (Input.GetKey(joystick + " button 3"))
             {
+                
                 Merge(other.gameObject);
             }
         }
-        IsGrounded();
         
+    }
+
+    
+    
+
+    // private void OnCollisionExit(Collision other) 
+    // {
+    //     if (other.gameObject.tag == "Cell")
+    //     {
+    //         EatenOne = other;
+    //         EatenCollision = false;
+    //     }
+    // }
+    private void OnTriggerEnter(Collider other) 
+    {
+        if (other.gameObject.tag == "Coin")
+        {
+            this.transform.DOPunchScale(this.transform.localScale*0.2f,0.2f,10,0.5f);
+            Destroy(other.gameObject);
+            points ++;
+            if (this.gameObject.tag == "MotherCell")
+            {
+                CellManager.instance.TotalPoints = points;
+                CellManager.instance.UpdateMainScore();
+            }
+            else if (joystick == "joystick 2")
+            {
+                CellManager.instance.SecondPoints = points;
+                CellManager.instance.UpdateSecondScore();
+            }
+        }
     }
 
     
 
     protected void Merge(GameObject EatenCell)
     {
-        if (this.transform.localScale.x > EatenCell.transform.localScale.x)   
+        if (this.transform.localScale.x > EatenCell.transform.localScale.x && this.gameObject.tag != "MotherCell")   
         { 
             CellManager.instance.PlayerNumber --;
             float AddedSize = OriginalScale.z/1.6f + EatenCell.transform.localScale.z/1.6f;
             this.transform.localScale = new Vector3(AddedSize,AddedSize,AddedSize);
             OriginalScale = this.transform.localScale;
             MoveSpeed = CellManager.instance.DefaultSpeed/(OriginalScale.z+CellManager.instance.SpeedDamp);
+            points += EatenCell.GetComponent<Cell>().points;
+            
             Destroy(EatenCell);
-            this.transform.DOPunchScale(this.transform.localScale*0.3f,0.4f,10,0.5f);
+            this.transform.DOPunchScale(this.transform.localScale*0.3f,0.4f,5,0.2f);
+            JumpHeight = CellManager.instance.DefaultJumpHeight * this.transform.localScale.z;
+            JumpPower = CellManager.instance.DefaultJumpPower * this.transform.localScale.z ;
+            rb.mass = CellManager.instance.DefaultMass * this.transform.localScale.z;
+            if (joystick == "joystick 2")
+            {
+                CellManager.instance.SecondPoints = points;
+                CellManager.instance.UpdateSecondScore();
+            }
+            
         }
         else if (this.gameObject.tag == "MotherCell")
         {
@@ -183,8 +286,21 @@ public class Cell : MonoBehaviour
             this.transform.localScale = new Vector3(AddedSize,AddedSize,AddedSize);
             OriginalScale = this.transform.localScale;
             MoveSpeed = CellManager.instance.DefaultSpeed/(OriginalScale.z+CellManager.instance.SpeedDamp);
+            points += EatenCell.GetComponent<Cell>().points;
+            if (EatenCell.GetComponent<Cell>().joystick == "joystick 2")
+            {
+                //Instructiontext.text = "Thank you for playing!";
+                CellManager.instance.SecondPoints = 0;
+                CellManager.instance.UpdateSecondScore();
+            }
             Destroy(EatenCell);
-            this.transform.DOPunchScale(this.transform.localScale*0.3f,0.4f,10,0.5f);
+            this.transform.DOPunchScale(this.transform.localScale*0.3f,0.4f,5,0.2f);
+            JumpHeight = CellManager.instance.DefaultJumpHeight * this.transform.localScale.z;
+            JumpPower = CellManager.instance.DefaultJumpPower * this.transform.localScale.z;
+            rb.mass = CellManager.instance.DefaultMass * this.transform.localScale.z;
+            Debug.Log(points);
+            CellManager.instance.TotalPoints = points;
+            CellManager.instance.UpdateMainScore();
         }
         
     }

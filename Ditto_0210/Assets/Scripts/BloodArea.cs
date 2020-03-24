@@ -8,11 +8,18 @@ public class BloodArea : MonoBehaviour
     public Vector3 direction;
     private void OnTriggerStay(Collider other) 
     {
-        
         if(other.tag == "MotherCell" || other.tag == "Cell")
         {
-            other.gameObject.GetComponent<Rigidbody>().AddForce(Vector3.left*strength);
-            Debug.Log("Enter wind zone");
+            other.gameObject.GetComponent<Rigidbody>().AddForce(direction*strength);
+            //other.gameObject.GetComponent<Rigidbody>().useGravity = false;
+        }
+    }
+
+    private void OnTriggerExit(Collider other) 
+    {
+        if(other.tag == "MotherCell" || other.tag == "Cell")
+        {
+            //other.gameObject.GetComponent<Rigidbody>().useGravity = true;
         }
     }
 }

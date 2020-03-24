@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CellManager : MonoBehaviour
 {
@@ -9,6 +10,14 @@ public class CellManager : MonoBehaviour
     public float DefaultMass = 10;
     public float DefaultSpeed = 3;
     public float SpeedDamp = 0.3f;
+    public float DefaultJumpHeight = 1.5f;
+    public float DefaultJumpPower = 2000;
+    public int TotalPoints;
+    public int SecondPoints;
+    public Text MainPointDisplay;
+    public Text SecondPointDisplay;
+    public float SmallestCellSize = 0.6f;
+    public float DefaultMoveForce = 100;
 
     void Awake() {
         {
@@ -25,7 +34,18 @@ public class CellManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        MainPointDisplay.text = TotalPoints.ToString();
+        SecondPointDisplay.text = SecondPoints.ToString();
+    }
+
+    public void UpdateMainScore()
+    {
+        MainPointDisplay.text = TotalPoints.ToString();
+    }
+
+    public void UpdateSecondScore()
+    {
+        SecondPointDisplay.text = SecondPoints.ToString();
     }
 
     // Update is called once per frame

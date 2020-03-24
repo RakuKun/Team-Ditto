@@ -14,8 +14,8 @@ public class ActivateAllDisplays : MonoBehaviour
         //         Display.displays[i].Activate(1920,1080,60);
         //     }
 
-            //Display.displays[1].Activate(1680,950,60);
-            //Display.displays[1].Activate(1920,1080,60);
+            Display.displays[1].Activate(1680,950,60);
+            Display.displays[1].Activate(1920,1080,60);
     }
     
     void Update()
