@@ -6,10 +6,20 @@ using RockVR.Video;
 public class StateShareMgr : MonoBehaviour
 {
     // Start is called before the first frame update
-    void Start()
-    {
-        
-
+    public GameObject UI;
+    public bool Share = false;
+    public static StateShareMgr instance = null;
+    void Awake() {
+        {
+            if (instance == null)
+            {
+                instance = this;
+            }
+            else if (instance != this)
+            {
+                Destroy(gameObject);
+            }
+        }
     }
 
     // Update is called once per frame
@@ -28,5 +38,16 @@ public class StateShareMgr : MonoBehaviour
             VideoPlayer.instance.SetRootFolder();
             VideoPlayer.instance.PlayVideo();
         }
+
+
+    }
+
+    public void OpenUI()
+    {
+        UI.SetActive(true);
+    }
+    public void CloseUI()
+    {
+        UI.SetActive(false);
     }
 }

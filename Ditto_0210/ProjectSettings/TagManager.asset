@@ -9,6 +9,8 @@ TagManager:
   - MotherCell
   - BloodArea
   - Coin
+  - Lymph
+  - Virus
   layers:
   - Default
   - TransparentFX
@@ -20,8 +22,8 @@ TagManager:
   - 
   - PostProcessing
   - Environment
-  - 
-  - 
+  - Player
+  - Virus
   - 
   - 
   - 

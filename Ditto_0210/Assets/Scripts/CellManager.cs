@@ -18,6 +18,7 @@ public class CellManager : MonoBehaviour
     public Text SecondPointDisplay;
     public float SmallestCellSize = 0.6f;
     public float DefaultMoveForce = 100;
+    public float DefaultMaxSpeed = 6;
 
     void Awake() {
         {
