@@ -67,30 +67,15 @@ public class Cell : MonoBehaviour
         }
        
         
-        //split
-        // if (Input.GetKeyDown(joystick + " button 2"))
-        // {
-        //     Split();
-        // }
-        
-        //change scale
-        
-    
-        
-        
         Stretching();
 
+        //Jump
         if (Input.GetKeyDown(joystick + " button 0")  || Input.GetKeyDown("space"))
         {
             //IsGrounded();
             if (isGrounded)
             {
-                //isFirstJump = true;
-                
-                 
-                //FinishJump = false;
-                //rb.useGravity = false;
-                //isGrounded = false;
+
                 StartCoroutine(Jump(Vector2.one));
             }
             else if (isFirstJump)
@@ -100,6 +85,7 @@ public class Cell : MonoBehaviour
             }
             
         }
+        //Magnetic power
         if (Input.GetKeyDown(joystick + " button 1"))
         {
 
@@ -111,10 +97,10 @@ public class Cell : MonoBehaviour
              MagEffect.Stop();
         }
 
-        //isGrounded = IsGround();
         
     }
 
+    //detect if the cell is grounded
     private bool IsGround()
     {
         if (this.transform.GetChild(0).GetComponent<DetectGround>().isGrounded == false
@@ -128,21 +114,14 @@ public class Cell : MonoBehaviour
     {
         if (Input.GetAxisRaw(joystick)!= 0 )
         {
-            //if (isGrounded)
                 LazyFollow(MoveForce);
-            //else
-                //LazyFollow(MoveForce*1f);
         }
-        //Stretching();
         if(rb.velocity.magnitude > MaxSpeed)
         {
             rb.velocity = rb.velocity.normalized * MaxSpeed;
         } 
-        //IsGrounded();
         
     }
-    
-
     
 
     public void Stretching()
@@ -170,18 +149,13 @@ public class Cell : MonoBehaviour
     {
         rb.AddForce(Vector3.right*JoyStickA*MoveForce);
         rb.AddForce(-Vector3.forward*JoyStickA_y*MoveForce);
-        //transform.Translate(Vector3.right*Time.deltaTime*JoyStickA*MoveSpeed,Space.World);     
+       
     }
 
     public IEnumerator Jump(Vector3 direction)
     {
         
-        // if (Input.GetAxisRaw(joystick) > 0)
-        //     direction = new Vector3(JumpDistance,0,JumpHeight);
-        // else if (Input.GetAxisRaw(joystick) < 0)
-        //     direction = new Vector3(-JumpDistance,0,JumpHeight);
-        // else 
-        //     direction = new Vector3(0,JumpHeight,0);
+        
         if (JoyStickA!=0)
         {
             direction = new Vector3(JoyStickA,0,0);
@@ -196,6 +170,7 @@ public class Cell : MonoBehaviour
 
     }
 
+    //Cell duplication
     public void Split()
     {
         if (this.transform.localScale.x > CellManager.instance.SmallestCellSize 
@@ -210,11 +185,7 @@ public class Cell : MonoBehaviour
             OriginalScale = this.transform.localScale;
             newCell.transform.localScale = OriginalScale;
             newCell.GetComponent<Cell>().OriginalScale = this.transform.localScale;
-            //newCell.GetComponent<Rigidbody>().useGravity = true;
-            //MoveSpeed = CellManager.instance.DefaultSpeed/(OriginalScale.z+CellManager.instance.SpeedDamp);
-            //JumpHeight = CellManager.instance.DefaultJumpHeight * this.transform.localScale.z;
-            //JumpPower = CellManager.instance.DefaultJumpPower * this.transform.localScale.z;
-            //rb.mass = CellManager.instance.DefaultMass * this.transform.localScale.z;
+           
             newCell.GetComponent<Rigidbody>().mass = CellManager.instance.DefaultMass;// * this.transform.localScale.z;
             newCell.GetComponent<Cell>().JumpPower = CellManager.instance.DefaultJumpPower;// * this.transform.localScale.z;
             newCell.GetComponent<Cell>().JumpHeight = CellManager.instance.DefaultJumpHeight;// * this.transform.localScale.z;
@@ -237,6 +208,7 @@ public class Cell : MonoBehaviour
 
     private void OnCollisionStay(Collision other) 
     {
+        //detect virus
         if (other.gameObject.tag == "Virus")
         {
             //EatenOne = other;
@@ -248,6 +220,7 @@ public class Cell : MonoBehaviour
             }
         }
 
+        //detect lymph node
         if (other.gameObject.tag == "Lymph")
         {
             if (Input.GetKeyDown(joystick + " button 2"))
@@ -259,17 +232,7 @@ public class Cell : MonoBehaviour
         
     }
 
-    
-    
-
-    // private void OnCollisionExit(Collision other) 
-    // {
-    //     if (other.gameObject.tag == "Cell")
-    //     {
-    //         EatenOne = other;
-    //         EatenCollision = false;
-    //     }
-    // }
+ 
     private void OnTriggerEnter(Collider other) 
     {
         if (other.gameObject.tag == "Coin")
@@ -293,53 +256,18 @@ public class Cell : MonoBehaviour
     }
 
     
-
+    //Merge,eat virus
     protected void Merge(GameObject EatenCell)
     {
-        // if (this.transform.localScale.x > EatenCell.transform.localScale.x && this.gameObject.tag != "Virus")   
-        // { 
-        //     CellManager.instance.PlayerNumber --;
-        //     float AddedSize = OriginalScale.z/1.6f + EatenCell.transform.localScale.z/1.6f;
-        //     this.transform.localScale = new Vector3(AddedSize,AddedSize,AddedSize);
-        //     OriginalScale = this.transform.localScale;
-        //     MoveSpeed = CellManager.instance.DefaultSpeed/(OriginalScale.z+CellManager.instance.SpeedDamp);
-        //     points += EatenCell.GetComponent<Cell>().points;
-            
-        //     Destroy(EatenCell);
-        //     this.transform.DOPunchScale(this.transform.localScale*0.3f,0.4f,5,0.2f);
-        //     JumpHeight = CellManager.instance.DefaultJumpHeight * this.transform.localScale.z;
-        //     JumpPower = CellManager.instance.DefaultJumpPower * this.transform.localScale.z ;
-        //     rb.mass = CellManager.instance.DefaultMass * this.transform.localScale.z;
-        //     if (joystick == "joystick 2")
-        //     {
-        //         CellManager.instance.SecondPoints = points;
-        //         CellManager.instance.UpdateSecondScore();
-        //     }
-            
-        // }
+       
         if (this.gameObject.tag != "Virus")
         {
-            //CellManager.instance.PlayerNumber --;
-            //float AddedSize = OriginalScale.z/1.6f + EatenCell.transform.localScale.z/1.6f;
-            //this.transform.localScale = new Vector3(AddedSize,AddedSize,AddedSize);
-            //OriginalScale = this.transform.localScale;
-            //MoveSpeed = CellManager.instance.DefaultSpeed/(OriginalScale.z+CellManager.instance.SpeedDamp);
-            //points += EatenCell.GetComponent<Cell>().points;
-            // if (EatenCell.GetComponent<Cell>().joystick == "joystick 2")
-            // {
-            //     //Instructiontext.text = "Thank you for playing!";
-            //     CellManager.instance.SecondPoints = 0;
-            //     CellManager.instance.UpdateSecondScore();
-            // }
+           
             StartCoroutine(DestroyVirus(EatenCell));
             this.transform.DOPunchScale(this.transform.localScale*0.02f,0.4f,5,0.2f);
-            
-            //JumpHeight = CellManager.instance.DefaultJumpHeight * this.transform.localScale.z;
-            //JumpPower = CellManager.instance.DefaultJumpPower * this.transform.localScale.z;
-            //rb.mass = CellManager.instance.DefaultMass * this.transform.localScale.z;
+           
             Debug.Log(points);
-            //CellManager.instance.TotalPoints = points;
-            //CellManager.instance.UpdateMainScore();
+            
         }
         
     }
@@ -352,10 +280,7 @@ public class Cell : MonoBehaviour
         Destroy(EatenCell);
     }
 
-    public void MagneticPower()
-    {
-
-    }
+ 
 
 
 }
